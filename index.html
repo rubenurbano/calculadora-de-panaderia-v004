@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b45309">
+<title>Calculadora de Panadería V4.0 Pro</title>
+<style>
+:root{
+  --bg:#f7f3ee;
+  --card:#ffffff;
+  --ink:#2c2420;
+  --muted:#736458;
+  --brand:#b45309;
+  --brand-dark:#853805;
+  --brand-soft:#fef4e8;
+  --line:#ebdcd0;
+  --radius:16px;
+  --shadow:0 3px 14px rgba(70,45,20,.06);
+  --ok-bg:#eaf6ed;
+  --ok-line:#bde3c6;
+  --ok-ink:#1b663e;
+  --err-bg:#fdf0ee;
+  --err-line:#f6c7c0;
+  --err-ink:#b3261e;
+  --info-bg:#eef6fc;
+  --info-line:#c5e0f7;
+  --info-ink:#145388;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:96px;
+  font-size:16px;
+  line-height:1.45;
+}
+
+/* ---------- HEADER ---------- */
+.app-header{
+  background:linear-gradient(135deg,#6d240d 0%,#b45309 60%,#d97706 100%);
+  color:#fff;
+  padding:26px 18px 28px;
+  text-align:center;
+  position:relative;
+  box-shadow:0 2px 10px rgba(90,40,10,.15);
+}
+.app-header h1{
+  font-size:1.35rem;
+  letter-spacing:1px;
+  margin:0 0 4px;
+  font-weight:800;
+}
+.app-header p{
+  margin:0;
+  font-size:.85rem;
+  opacity:.92;
+  font-weight:500;
+}
+
+/* ---------- TABS ---------- */
+.tabs{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  display:flex;
+  background:#fff;
+  border-top:1px solid var(--line);
+  z-index:60;
+  box-shadow:0 -4px 20px rgba(60,40,20,.08);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tabs button{
+  flex:1;
+  border:0;
+  background:transparent;
+  padding:10px 4px 12px;
+  font:inherit;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.4px;
+  color:var(--muted);
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  transition:color .18s ease, background .18s ease;
+}
+.tabs button .ico{font-size:1.3rem;line-height:1;}
+.tabs button.active{color:var(--brand);}
+.tabs button:active{background:#faf6f1;}
+
+/* ---------- LAYOUT ---------- */
+main{max-width:920px;margin:0 auto;padding:16px 14px 12px;}
+.view{display:none;}
+.view.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(0,0,0,.04);
+}
+.card h2{
+  font-size:.78rem;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--brand);
+  margin:0 0 14px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.card h2 .ico{font-size:1.1rem;}
+
+/* ---------- INPUTS ---------- */
+.lbl{
+  display:block;
+  font-size:.74rem;
+  font-weight:800;
+  letter-spacing:.8px;
+  color:var(--muted);
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+input[type=text],select{
+  width:100%;
+  padding:12px 14px;
+  border:1.5px solid var(--line);
+  border-radius:12px;
+  font:inherit;
+  font-size:1rem;
+  background:#fffdfa;
+  color:var(--ink);
+  transition:border-color .16s,box-shadow .16s,background .16s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+select{
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
+                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;
+  background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat;
+  padding-right:32px;
+}
+input:focus,select:focus{
+  outline:none;
+  border-color:var(--brand);
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(180,83,9,.14);
+}
+.mb{margin-bottom:12px;}
+
+/* ---------- HARINA BASE Y TOTALES ---------- */
+.flour-anchor{
+  background:linear-gradient(180deg,#fffaf3,#fffdfa);
+  border:1.5px solid #f1ddc0;
+  border-left:5px solid var(--brand);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.flour-anchor .lbl{color:var(--brand-dark);}
+.flour-anchor input{
+  font-size:1.25rem;
+  font-weight:800;
+  color:var(--brand-dark);
+  background:#fff;
+}
+
+.flour-summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--brand-soft);
+  border:1.5px solid #f3e0cc;
+  border-radius:12px;
+  padding:10px 14px;
+  margin-bottom:12px;
+  font-weight:800;
+}
+.flour-summary .fs-lbl{font-size:.72rem;letter-spacing:1px;color:var(--muted);}
+.flour-summary .fs-val{font-size:1.05rem;color:var(--brand-dark);}
+.flour-summary.ok{background:var(--ok-bg);border-color:var(--ok-line);}
+.flour-summary.ok .fs-val{color:var(--ok-ink);}
+.flour-summary.err{background:var(--err-bg);border-color:var(--err-line);}
+.flour-summary.err .fs-val{color:var(--err-ink);}
+
+.alert{
+  display:none;
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:.82rem;
+  font-weight:700;
+  margin-bottom:12px;
+}
+.alert.err{display:block;background:var(--err-bg);color:var(--err-ink);border:1px solid var(--err-line);}
+.alert.ok{display:block;background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line);}
+
+/* ---------- BOTONES ---------- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:0;
+  border-radius:12px;
+  padding:13px 16px;
+  font:inherit;
+  font-weight:700;
+  font-size:.88rem;
+  cursor:pointer;
+  background:var(--brand);
+  color:#fff;
+  width:100%;
+  transition:filter .16s,transform .08s;
+  text-decoration:none;
+}
+.btn:hover{filter:brightness(1.06);}
+.btn:active{transform:scale(.98);}
+.btn.sec{background:#efe6dc;color:var(--ink);}
+.btn.sec:hover{background:#e7dcd0;}
+.btn.ghost{background:transparent;color:var(--brand);border:1.5px solid var(--line);}
+.btn.small{padding:8px 12px;font-size:.78rem;}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ---------- MODO ---------- */
+.mode{
+  display:flex;
+  background:#eee4da;
+  border-radius:12px;
+  padding:4px;
+  gap:4px;
+  margin-bottom:12px;
+}
+.mode button{
+  flex:1;
+  border:0;
+  background:transparent;
+  padding:9px 6px;
+  border-radius:9px;
+  font:inherit;
+  font-size:.74rem;
+  font-weight:800;
+  letter-spacing:.5px;
+  color:var(--muted);
+  cursor:pointer;
+  transition:background .16s,color .16s,box-shadow .16s;
+}
+.mode button.active{
+  background:#fff;
+  color:var(--brand);
+  box-shadow:0 2px 6px rgba(80,50,20,.12);
+}
+
+/* ---------- LISTA DE INGREDIENTES ---------- */
+.ing-header{display:none;}
+.ing{
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.ing.is-flour{
+  background:linear-gradient(180deg,#fffaf3,#fffdfa);
+  border-color:#f1ddc0;
+  border-left:4px solid var(--brand);
+}
+.ing-top{display:flex;gap:6px;align-items:center;}
+.ing-name{flex:1;font-weight:700;}
+.btn-icon{
+  width:38px;height:38px;
+  border-radius:10px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;
+  color:var(--muted);
+  transition:background .15s;
+}
+.btn-icon:hover{background:#f5ece2;}
+.btn-icon.del{color:#b3261e;}
+.btn-icon.del:hover{background:var(--err-bg);border-color:var(--err-line);}
+
+.ing-fields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.ing-fields .ing-cat-fld{grid-column:1 / -1;}
+.ing-fields .fld-hyd{grid-column:1 / -1;display:none;}
+.ing.has-hyd .fld-hyd{display:block;}
+.fld{display:block;min-width:0;}
+.fld-lbl{
+  display:block;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.8px;
+  color:var(--muted);
+  margin-bottom:4px;
+  text-transform:uppercase;
+}
+
+#ingList[data-mode="gramos"] .ing-g{background:#fff8ee;border-color:#f3cca4;}
+#ingList[data-mode="porcentaje"] .ing-p{background:#fff8ee;border-color:#f3cca4;}
+
+/* ---------- RESULTADOS / STATS ---------- */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(min-width:620px){.stats{grid-template-columns:repeat(3,1fr);}}
+.stat{
+  background:var(--brand-soft);
+  border:1px solid #f2dec8;
+  border-radius:14px;
+  padding:12px 14px;
+}
+.stat .k{
+  font-size:.68rem;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-weight:800;
+}
+.stat .v{font-size:1.18rem;font-weight:800;margin-top:4px;}
+.stat .s{font-size:.72rem;color:var(--muted);margin-top:2px;font-weight:600;}
+.stat.primary{
+  background:linear-gradient(135deg,#b45309,#d97706);
+  border-color:transparent;
+  grid-column:span 2;
+  box-shadow:0 4px 14px rgba(180,83,9,.2);
+}
+.stat.primary .k{color:rgba(255,255,255,.9);}
+.stat.primary .v{color:#fff;font-size:1.45rem;}
+.stat.primary .s{color:rgba(255,255,255,.85);}
+@media(min-width:620px){.stat.primary{grid-column:span 1;}}
+
+.stat.real{
+  background:linear-gradient(135deg,#065f46,#0d9488);
+  border-color:transparent;
+}
+.stat.real .k{color:rgba(255,255,255,.92);}
+.stat.real .v{color:#fff;}
+.stat.real .s{color:rgba(255,255,255,.88);}
+
+.dough-badge{
+  display:inline-block;
+  background:#fff;
+  color:#065f46;
+  font-size:.7rem;
+  padding:2px 8px;
+  border-radius:999px;
+  font-weight:800;
+  margin-top:5px;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+}
+
+.hint{
+  font-size:.8rem;
+  color:var(--muted);
+  margin:10px 0 0;
+  text-align:center;
+  font-weight:600;
+}
+
+/* ---------- RECETAS ---------- */
+.recipe-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:border-color .18s,box-shadow .18s;
+}
+.recipe-item:hover{border-color:#d8beaa;box-shadow:var(--shadow);}
+.ri-info{flex:1;min-width:0;}
+.ri-name{font-weight:800;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ri-meta{font-size:.75rem;color:var(--muted);margin-top:3px;}
+.empty{
+  text-align:center;
+  color:var(--muted);
+  font-size:.88rem;
+  padding:36px 16px;
+  line-height:1.6;
+  background:#fff;
+  border-radius:14px;
+  border:1.5px dashed var(--line);
+}
+
+/* ---------- AYUDA ---------- */
+.help h3{font-size:.92rem;margin:0 0 8px;color:var(--brand-dark);font-weight:800;}
+.help p,.help ul{font-size:.86rem;color:#453a32;line-height:1.65;margin:0 0 12px;}
+.help ul{padding-left:20px;}
+.help code{
+  background:#f4ebd0;
+  padding:2px 6px;
+  border-radius:6px;
+  font-size:.82rem;
+  font-weight:700;
+  color:#853805;
+}
+.help .box{
+  background:var(--brand-soft);
+  border-left:4px solid var(--brand);
+  border-radius:0 12px 12px 0;
+  padding:12px 14px;
+  margin:0 0 14px;
+  font-size:.85rem;
+}
+.divider{height:1px;background:var(--line);margin:16px 0;}
+
+/* ---------- TOAST ---------- */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:90px;
+  transform:translate(-50%,20px);
+  background:#2c2420;
+  color:#fff;
+  padding:12px 20px;
+  border-radius:12px;
+  font-size:.84rem;
+  font-weight:600;
+  max-width:88vw;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease,transform .22s ease;
+  z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+.toast.ok{background:#1b663e;}
+.toast.err{background:#a92c22;}
+
+/* ---------- ESCRITORIO ---------- */
+@media (min-width:780px){
+  body{padding-bottom:30px;}
+  .app-header{padding:30px 20px 32px;}
+  .app-header h1{font-size:1.65rem;}
+  .tabs{
+    position:static;
+    justify-content:center;
+    gap:10px;
+    padding:12px 16px;
+    border-top:0;
+    border-bottom:1px solid var(--line);
+    background:#fffdf9;
+    box-shadow:none;
+  }
+  .tabs button{
+    flex:0 0 auto;
+    flex-direction:row;
+    padding:10px 24px;
+    border-radius:999px;
+    font-size:.84rem;
+    gap:8px;
+  }
+  .tabs button.active{background:var(--brand);color:#fff;}
+  main{padding:22px 18px 12px;}
+
+  .ing-header{
+    display:grid;
+    grid-template-columns:80px 2fr 1.3fr 1fr 1fr 1fr 40px;
+    gap:8px;
+    padding:0 12px 8px;
+    font-size:.68rem;
+    letter-spacing:.9px;
+    font-weight:800;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .ing-header span:nth-child(4),
+  .ing-header span:nth-child(5),
+  .ing-header span:nth-child(6){text-align:right;}
+
+  .ing{
+    display:grid;
+    grid-template-columns:80px 2fr 1.3fr 1fr 1fr 1fr 40px;
+    gap:8px;
+    align-items:center;
+    padding:8px 12px;
+  }
+  .ing-top,.ing-fields{display:contents;}
+  .ing-order{order:1;display:flex;gap:4px;}
+  .ing-name{order:2;}
+  .ing-cat-fld{order:3;grid-column:auto;}
+  .ing-fields .fld:nth-child(2){order:4;}
+  .ing-fields .fld:nth-child(3){order:5;}
+  .ing-fields .fld:nth-child(4){order:6;grid-column:auto;display:block;visibility:hidden;}
+  .ing.has-hyd .ing-fields .fld:nth-child(4){visibility:visible;}
+  .btn-icon.del{order:7;}
+  .fld-lbl{display:none;}
+  .ing-fields .fld input{text-align:right;}
+  .toast{bottom:30px;}
+}
+
+/* ---------- HOJA DE IMPRESIÓN (FICHA DE OBRADOR) ---------- */
+#printSheet{display:none;}
+@media print{
+  body{background:#fff;color:#000;padding:0;}
+  .app-header,.tabs,main,.toast{display:none !important;}
+  #printSheet{
+    display:block !important;
+    padding:20mm;
+    max-width:100%;
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+  }
+  #printSheet h1{font-size:22px;margin:0 0 4px;text-transform:uppercase;border-bottom:2px solid #000;padding-bottom:6px;}
+  #printSheet .sub{font-size:12px;color:#555;margin-bottom:18px;}
+  #printSheet table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}
+  #printSheet th,#printSheet td{border-bottom:1px solid #ddd;padding:7px 8px;text-align:left;}
+  #printSheet th{background:#f4f4f4;text-transform:uppercase;font-size:11px;}
+  #printSheet td.r,#printSheet th.r{text-align:right;}
+  #printSheet .box-notes{border:1px dashed #999;border-radius:6px;min-height:90px;padding:10px;margin-top:20px;}
+  @page{margin:12mm;}
+}
+
+/* ---------- AYUDA ---------- */
+.help .tw{overflow-x:auto;margin:10px 0;}
+.help table{width:100%;border-collapse:collapse;font-size:.85rem;}
+.help th,.help td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top;}
+.help th{background:var(--brand-soft);color:var(--brand-dark);font-size:.75rem;text-transform:uppercase;}
+.help ol.steps{padding-left:20px;margin:8px 0;}
+.help ol.steps li{margin-bottom:6px;}
+.help details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:#fff;}
+.help summary{cursor:pointer;font-weight:700;color:var(--brand-dark);}
+.help details p{margin:8px 0 0;}
+.help .toc{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px;}
+.help .toc a{font-size:.78rem;background:var(--brand-soft);color:var(--brand-dark);border-radius:999px;padding:5px 11px;text-decoration:none;font-weight:600;}
+.help .tip{background:#eaf6ed;border:1px solid #bde3c6;border-radius:12px;padding:10px 12px;margin:10px 0;color:#1b663e;}
+.help .warn{background:#fff4e5;border:1px solid #f3cca4;border-radius:12px;padding:10px 12px;margin:10px 0;color:#853805;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>CALCULADORA DE PANADERÍA -  PRO V4</h1>
+  <p>Fórmulas en gramos y porcentaje de panadero by Rubén Sbarsky (2026)</p>
+  <div style="margin-top:12px;display:flex;justify-content:center;">
+    <button class="btn small" type="button" id="btnDownloadAppHeader" style="width:auto;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.45);backdrop-filter:blur(6px);font-size:.78rem;padding:7px 16px;">
+      📥 Descargar esta App (.html)
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button type="button" data-tab="calc" class="active"><span class="ico">🧮</span>CALCULADORA</button>
+  <button type="button" data-tab="recetas"><span class="ico">📖</span>RECETAS</button>
+  <button type="button" data-tab="ayuda"><span class="ico">💡</span>AYUDA</button>
+</nav>
+
+<main>
+
+  <!-- ============ VISTA 1: CALCULADORA ============ -->
+  <section class="view active" id="view-calc">
+
+    <!-- RECETA -->
+    <div class="card">
+      <h2><span class="ico">📋</span>1 · Nombre de la receta</h2>
+      <label class="lbl" for="recipeName">Título</label>
+      <input id="recipeName" type="text" placeholder="Ej. Hogaza rústica masa madre" autocomplete="off" spellcheck="false">
+    </div>
+
+    <!-- INGREDIENTES -->
+    <div class="card">
+      <h2><span class="ico">🥣</span>2 · Ingredientes</h2>
+
+      <div class="flour-anchor">
+        <label class="lbl" for="flourTotal">Harina total de referencia (g) · Base 100 %</label>
+        <input id="flourTotal" type="text" inputmode="decimal" placeholder="1000" autocomplete="off">
+        <p class="hint" style="text-align:left;margin:6px 0 0;">
+          Peso base de harina sobre el que se calculan todos los porcentajes.
+        </p>
+      </div>
+
+      <div class="flour-summary ok" id="flourSummaryBox">
+        <span class="fs-lbl">TOTAL HARINAS</span>
+        <span class="fs-val" id="flourSumValue">100 %</span>
+      </div>
+
+      <button class="btn ghost small" type="button" id="btnAutoLevel" style="display:none;margin-bottom:12px;">
+        ⚖️ Autonivelar harinas al 100 %
+      </button>
+
+      <div class="alert" id="flourAlert"></div>
+
+      <div class="mode" id="modeSwitch">
+        <button type="button" data-mode="gramos" class="active">● ENTRADA EN GRAMOS</button>
+        <button type="button" data-mode="porcentaje">○ ENTRADA EN %</button>
+      </div>
+
+      <div class="ing-header">
+        <span>Orden</span><span>Ingrediente</span><span>Categoría</span><span>Gramos</span><span>%</span><span>Hidr. %</span><span></span>
+      </div>
+      <div id="ingList" data-mode="gramos"></div>
+
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn" type="button" id="btnAddIng">＋ Ingrediente</button>
+        <button class="btn sec" type="button" id="btnAddFlour">🌾 Añadir harina</button>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="card">
+      <h2><span class="ico">📊</span>3 · Resumen analítico</h2>
+      <div class="stats" id="stats"></div>
+      <p class="hint" id="statsNote" style="text-align:left;">🌾 <strong>Hidratación real calculada:</strong> Incluye los <strong>100 g de harina</strong> y <strong>100 g de agua</strong> aportados por los prefermentos.</p>
+
+      <div class="divider"></div>
+
+      <!-- ASISTENTE DE AGUA OBJETIVO -->
+      <label class="lbl">Asistente de hidratación real deseada</label>
+      <div style="display:flex;gap:8px;">
+        <input id="targetHydVal" type="text" inputmode="decimal" placeholder="Ej. 72 (%)" style="max-width:140px;">
+        <button class="btn sec small" type="button" id="btnAutoHyd">🎯 Fijar agua para esta hidratación</button>
+      </div>
+    </div>
+
+    <!-- ESCALADO -->
+    <div class="card">
+      <h2><span class="ico">⚖️</span>4 · Escalar receta</h2>
+
+      <label class="lbl" for="targetWeight">Peso total de masa deseado (g)</label>
+      <div style="display:flex;gap:8px;" class="mb">
+        <input id="targetWeight" type="text" inputmode="decimal" placeholder="Ej. 1800" autocomplete="off">
+        <button class="btn" type="button" id="btnCalcFlour" style="width:auto;white-space:nowrap;">🎯 Escalar</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <label class="lbl">Cálculo por piezas y merma</label>
+      <div class="ing-fields" style="margin-top:0;">
+        <div class="fld">
+          <span class="fld-lbl">Nº de piezas</span>
+          <input id="numPieces" type="text" inputmode="decimal" placeholder="Ej. 6" autocomplete="off">
+        </div>
+        <div class="fld">
+          <span class="fld-lbl">Peso por pieza (g)</span>
+          <input id="pieceWeight" type="text" inputmode="decimal" placeholder="Ej. 300" autocomplete="off">
+        </div>
+        <div class="fld" style="grid-column:1 / -1;">
+          <span class="fld-lbl">Merma en horno (%)</span>
+          <input id="bakeLoss" type="text" inputmode="decimal" placeholder="Ej. 12" autocomplete="off">
+        </div>
+      </div>
+      <p class="hint" style="margin:12px 0 10px;text-align:left;">Masa requerida: <strong id="targetPreview">—</strong></p>
+      <button class="btn" type="button" id="btnScale">⚖️ ESCALAR SEGÚN PIEZAS</button>
+    </div>
+
+    <!-- OPCIONES -->
+    <div class="card">
+      <h2><span class="ico">⚙️</span>Acciones y Exportación</h2>
+      <div class="btn-grid">
+        <button class="btn" type="button" id="btnSave">💾 Guardar receta</button>
+        <button class="btn sec" type="button" id="btnDuplicate">📑 Duplicar receta</button>
+        <button class="btn sec" type="button" id="btnPrint">🖨️ Ficha / Imprimir</button>
+        <button class="btn sec" type="button" id="btnCopyText">📋 Copiar texto</button>
+        <button class="btn sec" type="button" id="btnExport">⬇️ Descargar TXT</button>
+        <button class="btn sec" type="button" id="btnDownloadAppCard">📥 Descargar App (.html)</button>
+        <button class="btn sec" type="button" id="btnExportJson">🗄️ Copia de seguridad</button>
+        <button class="btn sec" type="button" id="btnImportJson">📥 Restaurar copia</button>
+        <button class="btn sec" type="button" id="btnClear">🧹 Limpiar campos</button>
+      </div>
+      <input type="file" id="fileImportJson" accept="application/json,.json" style="display:none;">
+      <div style="height:8px;"></div>
+      <button class="btn ghost small" type="button" id="btnReset">↺ Restaurar receta de ejemplo</button>
+    </div>
+
+  </section>
+
+  <!-- ============ VISTA 2: MIS RECETAS ============ -->
+  <section class="view" id="view-recetas">
+    <div class="card">
+      <h2><span class="ico">📖</span>Mis recetas guardadas</h2>
+      <div id="recipesList"></div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA 3: AYUDA ============ -->
+  <section class="view" id="view-ayuda">
+    <div class="card help">
+      <h2><span class="ico">💡</span>Guía y Conceptos Profesionales</h2>
+      <div class="toc">
+        <a href="#h-inicio">Guía rápida</a><a href="#h-pct">% panadero</a><a href="#h-cat">Categorías</a>
+        <a href="#h-pref">Prefermentos</a><a href="#h-hid">Hidratación</a><a href="#h-esc">Escalar</a>
+        <a href="#h-rec">Recetas y copias</a><a href="#h-num">Números</a><a href="#h-faq">Problemas</a>
+      </div>
+
+      <h3 id="h-inicio">🚀 Guía rápida en 6 pasos</h3>
+      <ol class="steps">
+        <li><strong>Nombra</strong> la receta (necesario para guardarla).</li>
+        <li><strong>Harina de referencia:</strong> el peso base (100 %) sobre el que se calcula todo.</li>
+        <li><strong>Añade ingredientes</strong> y elige su <em>categoría</em>: de ella depende cómo se calcula la hidratación.</li>
+        <li>Escribe en <strong>gramos</strong> o en <strong>%</strong>: el otro campo se calcula solo.</li>
+        <li>Revisa el <strong>Resumen analítico</strong> (peso total, hidratación real, consistencia).</li>
+        <li><strong>Escala</strong> al peso o nº de piezas que necesites y pulsa <strong>Guardar receta</strong>.</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <h3 id="h-pct">📐 Porcentaje de panadero</h3>
+      <p>La <strong>harina total es siempre el 100 %</strong>. Cada ingrediente se expresa respecto a ese peso:</p>
+      <div class="box">
+        <strong>% = gramos del ingrediente ÷ gramos de harina × 100</strong><br><br>
+        <strong>Ejemplo con 1.000 g de harina:</strong><br>
+        Harina = 1.000 g → <strong>100 %</strong> · Agua = 680 g → <strong>68 %</strong><br>
+        Sal = 20 g → <strong>2 %</strong> · Levadura fresca = 8 g → <strong>0,8 %</strong><br>
+        <em>Peso total de la masa = 1.708 g (formula total 170,8 %)</em>
+      </div>
+      <p>Por eso los porcentajes <strong>no suman 100</strong>: solo las harinas deben sumar 100 %. Si usas varias harinas (p. ej. 80 % fuerza + 20 % centeno) la calculadora te avisa y ofrece <em>Autonivelar</em>.</p>
+
+      <div class="divider"></div>
+
+      <h3 id="h-cat">🏷️ Categorías de ingredientes</h3>
+      <div class="tw"><table>
+        <tr><th>Categoría</th><th>Para qué sirve</th><th>Cuenta como agua</th></tr>
+        <tr><td>Harina</td><td>Base 100 %. Debe haber al menos una.</td><td>—</td></tr>
+        <tr><td>Agua</td><td>Agua añadida. Es la que ajusta el asistente.</td><td>100 %</td></tr>
+        <tr><td>Líquido</td><td>Leche, nata, bebidas vegetales…</td><td>87 %</td></tr>
+        <tr><td>Huevo</td><td>Huevo entero (≈ 50 g cada uno).</td><td>75 %</td></tr>
+        <tr><td>Prefermento / Masa madre</td><td>Poolish, biga, masa madre… aporta harina y agua.</td><td>Según su hidratación</td></tr>
+        <tr><td>Sal, levadura, grasa, azúcar, otro</td><td>No modifican la hidratación.</td><td>—</td></tr>
+      </table></div>
+
+      <div class="divider"></div>
+
+      <h3 id="h-pref">🥖 Prefermentos y masa madre</h3>
+      <p>Un prefermento contiene harina <em>y</em> agua. Indica su <strong>hidratación</strong> y la calculadora los separa:</p>
+      <div class="box">
+        harina = gramos ÷ (1 + hidratación/100) · agua = gramos − harina<br><br>
+        <strong>200 g de masa madre al 100 %</strong> → 100 g de harina + 100 g de agua
+      </div>
+      <div class="tw"><table>
+        <tr><th>Hidratación</th><th>Tipo habitual</th><th>En 200 g: harina / agua</th></tr>
+        <tr><td>50–60 %</td><td>Biga, masa madre sólida</td><td>125 g / 75 g (al 60 %)</td></tr>
+        <tr><td>80 %</td><td>Masa madre semilíquida</td><td>111 g / 89 g</td></tr>
+        <tr><td>100 %</td><td>Masa madre líquida, poolish</td><td>100 g / 100 g</td></tr>
+        <tr><td>125 %</td><td>Masa madre muy líquida</td><td>89 g / 111 g</td></tr>
+      </table></div>
+      <div class="tip">💡 Si tu masa madre es 100 % (mismo peso de harina y agua), deja la hidratación en 100.</div>
+
+      <div class="divider"></div>
+
+      <h3 id="h-hid">💧 Hidratación: añadida vs. real</h3>
+      <ul>
+        <li><strong>Hidratación añadida:</strong> agua, leche y huevo que pones directamente, sobre la harina base.</li>
+        <li><strong>Hidratación real:</strong> suma también el agua y la harina que aportan los prefermentos. Es la que define la textura de la masa.</li>
+      </ul>
+      <div class="box">
+        <strong>Ejemplo:</strong> 1.000 g de harina, 680 g de agua y 200 g de masa madre al 100 %.<br>
+        Añadida = 68 % · Agua real = 680 + 100 = 780 g · Harina real = 1.000 + 100 = 1.100 g<br>
+        <strong>Hidratación real = 780 ÷ 1.100 = 70,9 %</strong>
+      </div>
+      <div class="tw"><table>
+        <tr><th>Hidratación</th><th>Masa</th><th>Ejemplos</th></tr>
+        <tr><td>45 – 56 %</td><td>Dura / candeal</td><td>Pan sobado, colines, bagels</td></tr>
+        <tr><td>57 – 66 %</td><td>Media estándar</td><td>Pan de barra, pan de molde</td></tr>
+        <tr><td>67 – 76 %</td><td>Hidratada</td><td>Hogazas rústicas, batards</td></tr>
+        <tr><td>77 – 90 %+</td><td>Alta hidratación</td><td>Ciabatta, focaccia, pan de cristal</td></tr>
+      </table></div>
+      <p><strong>🎯 Asistente de hidratación:</strong> escribe la hidratación real deseada (p. ej. 72) y pulsa el botón. Ajusta el ingrediente <em>Agua</em> teniendo en cuenta prefermentos, leche y huevo. Si el objetivo es inalcanzable, te lo indica.</p>
+
+      <div class="divider"></div>
+
+      <h3 id="h-esc">⚖️ Escalar la receta</h3>
+      <p><strong>Por peso total:</strong> indica cuánta masa quieres y se recalcula la harina base manteniendo los porcentajes.</p>
+      <p><strong>Por piezas y merma:</strong> el horno evapora agua, así que hay que amasar más de lo que vas a servir.</p>
+      <div class="box">
+        masa cruda = piezas × peso ÷ (1 − merma/100)<br><br>
+        <strong>Ejemplo:</strong> 6 piezas × 300 g = 1.800 g horneados; con 12 % de merma → <strong>2.045,45 g de masa cruda</strong>.
+      </div>
+      <div class="tip">💡 La merma habitual es 8–15 % (más alta en piezas pequeñas y cocción larga). Se admite de 0 a 50 %.</div>
+
+      <div class="divider"></div>
+
+      <h3 id="h-rec">📚 Recetas, copias e impresión</h3>
+      <ul>
+        <li><strong>Guardar:</strong> almacena la receta en este navegador. Si guardas con un nombre ya existente, se actualiza.</li>
+        <li><strong>Duplicar:</strong> crea «Nombre (Copia)» para hacer variantes; pulsa Guardar cuando termines.</li>
+        <li><strong>Mis recetas:</strong> toca una para cargarla. Si tienes cambios sin guardar, te avisa antes.</li>
+        <li><strong>Copia de seguridad:</strong> descarga un .json con todas tus recetas. Al restaurar puedes <em>fusionar</em> o <em>reemplazar</em>.</li>
+        <li><strong>Ficha / Imprimir:</strong> hoja de obrador con casillas ☐ y espacio para notas.</li>
+        <li><strong>Copiar texto / TXT:</strong> receta en texto plano para mensajes o notas.</li>
+        <li><strong>Descargar App:</strong> te da esta calculadora como archivo .html para usarla sin conexión.</li>
+      </ul>
+      <div class="warn">⚠️ Las recetas se guardan <strong>solo en este navegador y dispositivo</strong>. Si borras los datos del navegador se pierden: haz una copia de seguridad de vez en cuando.</div>
+
+      <div class="divider"></div>
+
+      <h3 id="h-num">🔢 Cómo escribir los números</h3>
+      <ul>
+        <li>Decimales con <strong>coma o punto</strong>: <code>0,8</code> y <code>0.8</code> valen igual.</li>
+        <li>En <strong>gramos</strong>, <code>1.500</code> se entiende como mil quinientos. En porcentajes, <code>0.125</code> es 0,125.</li>
+        <li>Con separador de miles y decimales: <code>1.250,5</code> o <code>1,250.5</code>.</li>
+        <li>Los campos con datos inválidos se corrigen solos al salir de ellos.</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <h3>📏 Proporciones orientativas (sobre harina)</h3>
+      <div class="tw"><table>
+        <tr><th>Ingrediente</th><th>Rango habitual</th></tr>
+        <tr><td>Sal</td><td>1,8 – 2,2 %</td></tr>
+        <tr><td>Levadura fresca</td><td>0,5 – 3 % (según tiempo de fermentación)</td></tr>
+        <tr><td>Levadura seca</td><td>≈ 1/3 de la fresca</td></tr>
+        <tr><td>Masa madre</td><td>10 – 30 %</td></tr>
+        <tr><td>Grasa / aceite</td><td>2 – 5 % (masas ricas hasta 20 % o más)</td></tr>
+        <tr><td>Azúcar / miel</td><td>1 – 10 % (bollería más)</td></tr>
+      </table></div>
+      <p class="hint" style="text-align:left;">Son valores de referencia: ajusta según harina, temperatura y tu método.</p>
+
+      <div class="divider"></div>
+
+      <h3 id="h-faq">🛠️ Problemas frecuentes</h3>
+      <details><summary>Las harinas no suman 100 %</summary><p>Pulsa <em>Autonivelar harinas al 100 %</em>: reparte proporcionalmente. Solo las harinas deben sumar 100 %.</p></details>
+      <details><summary>No puedo eliminar o cambiar la única harina</summary><p>La receta necesita al menos una harina como base. Añade otra antes de quitar la primera.</p></details>
+      <details><summary>Al cambiar los gramos de una harina cambian los de los demás</summary><p>Es el comportamiento del porcentaje de panadero: agua, sal, etc. mantienen su % y sus gramos se recalculan sobre la nueva harina.</p></details>
+      <details><summary>La hidratación real no coincide con la de mi receta original</summary><p>Comprueba la hidratación del prefermento y que la leche/huevo estén con su categoría: cuentan como agua parcial (87 % y 75 %).</p></details>
+      <details><summary>«Copiar texto» no funciona</summary><p>Algunos navegadores bloquean el portapapeles. Usa <em>Descargar TXT</em>.</p></details>
+      <details><summary>Perdí mis recetas</summary><p>Están en el almacenamiento del navegador. Si tienes una copia .json, usa <em>Restaurar copia</em> y elige <em>Fusionar</em>.</p></details>
+    </div>
+  </section>
+
+</main>
+
+<!-- FICHA OCULTA PARA IMPRESIÓN LIMPIA NATIVA -->
+<div id="printSheet"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   UTILIDADES Y PARSER NUMÉRICO INTELIGENTE (EUROPA + USA)
+   ========================================================= */
+var PRISTINE_HTML = '';
+try { PRISTINE_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML; } catch(e){}
+var _uid = 0;
+function uid(){ _uid++; return 'i' + _uid + '_' + Math.random().toString(36).slice(2,7); }
+
+function parseNum(v, opts){
+  var grams = !!(opts && opts.grams);
+  if (v === null || v === undefined) return NaN;
+  var s = String(v).trim();
+  if (s === '') return NaN;
+  if (/^\d{1,3}(\.\d{3})+,\d+$/.test(s)) s = s.replace(/\./g,'').replace(',','.');
+  else if (/^\d{1,3}(,\d{3})+\.\d+$/.test(s)) s = s.replace(/,/g,'');
+  else if (/^[1-9]\d{0,2}(\.\d{3}){2,}$/.test(s)) s = s.replace(/\./g,'');
+  else if (/^[1-9]\d{0,2}(,\d{3}){2,}$/.test(s)) s = s.replace(/,/g,'');
+  else if (grams && /^[1-9]\d{0,2}\.\d{3}$/.test(s)) s = s.replace('.','');
+  else s = s.replace(',','.');
+  if (!/^-?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+  var n = Number(s);
+  return isFinite(n) ? n : NaN;
+}
+
+var nf = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 });
+function fmtG(n){ if (!isFinite(n)) n = 0; return nf.format(Math.round(n * 100) / 100); }
+function fmtP(n){ if (!isFinite(n)) n = 0; return nf.format(Math.round(n * 100) / 100); }
+function fmtPlain(n){
+  if (!isFinite(n)) n = 0;
+  return String(Math.round(n * 100) / 100).replace('.', ',');
+}
+function fmtInput(n){
+  if (!isFinite(n)) return '';
+  var r = Math.round(n * 1000) / 1000;
+  if (r === 0) return '';
+  return String(r).replace('.', ',');
+}
+function fmtHyd(n){ if (!isFinite(n)) return ''; return String(Math.round(n*1000)/1000).replace('.', ','); }
+function esc(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* =========================================================
+   NOTIFICACIONES TOAST
+   ========================================================= */
+var toastTimer = null;
+function toast(msg, tipo){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (tipo ? ' ' + tipo : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className = 'toast'; }, 2600);
+}
+
+/* =========================================================
+   CATEGORÍAS DE INGREDIENTES
+   ========================================================= */
+var CATS = [
+  { id:'harina',      label:'Harina' },
+  { id:'agua',        label:'Agua' },
+  { id:'liquido',     label:'Líquido (leche, etc.)' },
+  { id:'huevo',       label:'Huevo' },
+  { id:'sal',         label:'Sal' },
+  { id:'levadura',    label:'Levadura' },
+  { id:'prefermento', label:'Prefermento / Masa Madre' },
+  { id:'grasa',       label:'Grasa / Aceite' },
+  { id:'azucar',      label:'Azúcar / Miel' },
+  { id:'otro',        label:'Otro' }
+];
+
+/* =========================================================
+   ESTADO DE LA APLICACIÓN
+   ========================================================= */
+var LS_RECIPES = 'panaderia.recetas.v3';
+var LS_CURRENT = 'panaderia.actual.v3';
+
+var state = { name: '', flourTotal: 1000, items: [] };
+
+function exampleRecipe(){
+  return {
+    name: 'Hogaza rústica masa madre',
+    flourTotal: 1000,
+    items: [
+      { id: uid(), name: 'Harina de fuerza W300', cat: 'harina', pct: 80, hyd: 100 },
+      { id: uid(), name: 'Harina integral de centeno', cat: 'harina', pct: 20, hyd: 100 },
+      { id: uid(), name: 'Agua', cat: 'agua', pct: 68, hyd: 100 },
+      { id: uid(), name: 'Masa madre (100 % hidr.)', cat: 'prefermento', pct: 20, hyd: 100 },
+      { id: uid(), name: 'Sal fina', cat: 'sal', pct: 2, hyd: 100 }
+    ]
+  };
+}
+
+function isFlour(it){ return it && it.cat === 'harina'; }
+function isPref(it){ return it && it.cat === 'prefermento'; }
+function getFlours(){ return state.items.filter(isFlour); }
+function getNonFlours(){ return state.items.filter(function(it){ return !isFlour(it); }); }
+function byId(id){
+  for (var i = 0; i < state.items.length; i++) if (state.items[i].id === id) return state.items[i];
+  return null;
+}
+function flourPctSum(){
+  var s = 0, fs = getFlours();
+  for (var i = 0; i < fs.length; i++) s += (fs[i].pct || 0);
+  return s;
+}
+function totalPctSum(){
+  var s = 0;
+  for (var i = 0; i < state.items.length; i++) s += (state.items[i].pct || 0);
+  return s;
+}
+function itemGrams(it){
+  if (!it) return 0;
+  return state.flourTotal * (it.pct || 0) / 100;
+}
+function totalMassGrams(){
+  var s = 0;
+  for (var i = 0; i < state.items.length; i++) s += itemGrams(state.items[i]);
+  return s;
+}
+function flourMassGrams(){
+  var s = 0, fs = getFlours();
+  for (var i = 0; i < fs.length; i++) s += itemGrams(fs[i]);
+  return s;
+}
+function floursAreValid(){
+  var fs = getFlours();
+  if (!fs.length) return false;
+  return Math.abs(flourPctSum() - 100) < 0.05;
+}
+
+/* Prefermentos: Descomposición en harina y agua */
+function prefermentContrib(){
+  var fTotal = 0, wTotal = 0;
+  for (var i = 0; i < state.items.length; i++){
+    var it = state.items[i];
+    if (!isPref(it)) continue;
+    var g = itemGrams(it);
+    var h = (it.hyd != null && isFinite(Number(it.hyd))) ? Number(it.hyd) : 100;
+    if (h < 0) h = 0;
+    var f = g / (1 + (h / 100));
+    var w = g - f;
+    fTotal += f;
+    wTotal += w;
+  }
+  return { flours: fTotal, water: wTotal };
+}
+
+/* =========================================================
+   ALMACENAMIENTO LOCAL
+   ========================================================= */
+function saveSaved(list){
+  try { localStorage.setItem(LS_RECIPES, JSON.stringify(list)); } catch(e){}
+}
+function loadSaved(){
+  try {
+    var raw = localStorage.getItem(LS_RECIPES) || localStorage.getItem('panaderia.recetas.v1');
+    var arr = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(arr)) return [];
+    arr = arr.filter(function(x){ return x && typeof x === 'object'; });
+    var changed = false;
+    arr.forEach(function(x){ if (!x.id){ x.id = uid(); changed = true; } });
+    if (changed) saveSaved(arr);
+    return arr;
+  } catch(e){ return []; }
+}
+var WATER_FRAC = { agua:1, liquido:0.87, huevo:0.75 };
+function computeStats(){
+  var pf = prefermentContrib(), waterPct = 0;
+  for (var i = 0; i < state.items.length; i++){
+    var it = state.items[i];
+    waterPct += (it.pct || 0) * (WATER_FRAC[it.cat] || 0);
+  }
+  var flourMass = flourMassGrams();
+  var aguaG = state.flourTotal * waterPct / 100;
+  var realFlour = flourMass + pf.flours, realWater = aguaG + pf.water;
+  return { pf: pf, flourMass: flourMass, totalMass: totalMassGrams(), totalPct: totalPctSum(),
+           waterPct: waterPct, aguaG: aguaG, realFlour: realFlour, realWater: realWater,
+           realHyd: realFlour > 0 ? realWater / realFlour * 100 : 0 };
+}
+function sanitizeItems(items){
+  var out = [], ids = CATS.map(function(c){ return c.id; });
+  (Array.isArray(items) ? items : []).forEach(function(it){
+    if (!it || typeof it !== 'object') return;
+    var p = Number(it.pct), h = Number(it.hyd);
+    out.push({ id: (typeof it.id === 'string' && it.id) ? it.id : uid(),
+      name: String(it.name || ''), cat: ids.indexOf(it.cat) >= 0 ? it.cat : 'otro',
+      pct: (isFinite(p) && p >= 0) ? p : 0, hyd: (isFinite(h) && h >= 0) ? h : 100 });
+  });
+  return out;
+}
+function askChoice(msg, opts){
+  var bg = document.createElement('div');
+  bg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:16px;padding:20px;max-width:380px;width:100%;';
+  var p = document.createElement('p');
+  p.style.cssText = 'margin:0 0 12px;line-height:1.4;';
+  p.textContent = msg;
+  box.appendChild(p);
+  opts.forEach(function(o){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn ' + (o.cls === undefined ? 'sec' : o.cls);
+    b.style.marginTop = '8px'; b.textContent = o.label;
+    b.addEventListener('click', function(){ document.body.removeChild(bg); if (o.fn) o.fn(); });
+    box.appendChild(b);
+  });
+  bg.appendChild(box);
+  document.body.appendChild(bg);
+}
+function sigOf(name, ft, items){
+  return JSON.stringify([String(name||'').trim().toLowerCase(), Math.round(ft*1000), (items||[]).map(function(i){
+    return [i.name||'', i.cat, Math.round((i.pct||0)*1000), Math.round((i.hyd==null?100:i.hyd)*1000)];
+  })]);
+}
+function isSafeToReplace(){
+  var cur = sigOf(state.name, state.flourTotal, state.items);
+  var ex = exampleRecipe();
+  if (cur === sigOf(ex.name, ex.flourTotal, ex.items)) return true;
+  if (!state.name.trim() && state.items.length <= 1 && !(state.items[0] && state.items[0].name)) return true;
+  var list = loadSaved(), n = state.name.trim().toLowerCase();
+  for (var i = 0; i < list.length; i++){
+    if ((list[i].name||'').trim().toLowerCase() === n && sigOf(list[i].name, list[i].flourTotal, list[i].items) === cur) return true;
+  }
+  return false;
+}
+function guardChanges(action){
+  if (isSafeToReplace()) { action(); return; }
+  var opts = [];
+  if (state.name.trim()) opts.push({ label: 'Guardar y continuar', cls: '', fn: function(){ saveCurrentRecipe(); action(); } });
+  opts.push({ label: 'Continuar sin guardar', fn: action });
+  opts.push({ label: 'Cancelar', cls: 'ghost' });
+  askChoice('Tienes cambios sin guardar en la receta actual. Si continúas se perderán.', opts);
+}
+
+function saveCurrent(){
+  try {
+    localStorage.setItem(LS_CURRENT, JSON.stringify({
+      name: state.name,
+      flourTotal: state.flourTotal,
+      items: state.items
+    }));
+  } catch(e){}
+}
+
+/* =========================================================
+   CONSTRUCCIÓN VISUAL DE INGREDIENTES
+   ========================================================= */
+function makeRow(it, index, totalRows){
+  var row = document.createElement('div');
+  row.className = 'ing' + (isFlour(it) ? ' is-flour' : '') + (isPref(it) ? ' has-hyd' : '');
+  row.dataset.id = it.id;
+
+  var top = document.createElement('div');
+  top.className = 'ing-top';
+
+  var orderBox = document.createElement('div');
+  orderBox.className = 'ing-order';
+
+  var btnUp = document.createElement('button');
+  btnUp.type = 'button';
+  btnUp.className = 'btn-icon';
+  btnUp.textContent = '▲';
+  btnUp.title = 'Subir ingrediente';
+  btnUp.disabled = (index === 0);
+  btnUp.addEventListener('click', function(){ moveItem(it.id, -1); });
+
+  var btnDown = document.createElement('button');
+  btnDown.type = 'button';
+  btnDown.className = 'btn-icon';
+  btnDown.textContent = '▼';
+  btnDown.title = 'Bajar ingrediente';
+  btnDown.disabled = (index === totalRows - 1);
+  btnDown.addEventListener('click', function(){ moveItem(it.id, 1); });
+
+  orderBox.appendChild(btnUp);
+  orderBox.appendChild(btnDown);
+
+  var nameIn = document.createElement('input');
+  nameIn.type = 'text';
+  nameIn.className = 'ing-name';
+  nameIn.value = it.name || '';
+  nameIn.placeholder = isFlour(it) ? 'Tipo de harina' : 'Ingrediente';
+  nameIn.setAttribute('autocomplete','off');
+  nameIn.addEventListener('input', function(){
+    it.name = nameIn.value;
+    saveCurrent();
+  });
+
+  var del = document.createElement('button');
+  del.type = 'button';
+  del.className = 'btn-icon del';
+  del.textContent = '🗑';
+  del.title = 'Eliminar ingrediente';
+  del.addEventListener('click', function(){ removeItem(it.id); });
+
+  top.appendChild(orderBox);
+  top.appendChild(nameIn);
+  top.appendChild(del);
+
+  var fields = document.createElement('div');
+  fields.className = 'ing-fields';
+
+  /* Categoría */
+  var fldC = document.createElement('label');
+  fldC.className = 'fld ing-cat-fld';
+  var lblC = document.createElement('span');
+  lblC.className = 'fld-lbl';
+  lblC.textContent = 'Categoría';
+  var catSel = document.createElement('select');
+  for (var ci = 0; ci < CATS.length; ci++){
+    var opt = document.createElement('option');
+    opt.value = CATS[ci].id;
+    opt.textContent = CATS[ci].label;
+    if (CATS[ci].id === it.cat) opt.selected = true;
+    catSel.appendChild(opt);
+  }
+  catSel.addEventListener('change', function(){ onCatChange(it.id, catSel.value); });
+  fldC.appendChild(lblC);
+  fldC.appendChild(catSel);
+
+  /* Gramos */
+  var fldG = document.createElement('label');
+  fldG.className = 'fld';
+  var lblG = document.createElement('span');
+  lblG.className = 'fld-lbl';
+  lblG.textContent = 'Gramos';
+  var gIn = document.createElement('input');
+  gIn.type = 'text';
+  gIn.setAttribute('inputmode','decimal');
+  gIn.className = 'ing-g';
+  gIn.value = fmtInput(itemGrams(it));
+  gIn.placeholder = '0';
+  gIn.addEventListener('input', function(){ onGramsInput(it.id, gIn); });
+  gIn.addEventListener('focus', function(){ gIn.select(); });
+  gIn.addEventListener('blur', function(){ refresh(null); });
+  fldG.appendChild(lblG);
+  fldG.appendChild(gIn);
+
+  /* Porcentaje */
+  var fldP = document.createElement('label');
+  fldP.className = 'fld';
+  var lblP = document.createElement('span');
+  lblP.className = 'fld-lbl';
+  lblP.textContent = '% Panadero';
+  var pIn = document.createElement('input');
+  pIn.type = 'text';
+  pIn.setAttribute('inputmode','decimal');
+  pIn.className = 'ing-p';
+  pIn.value = fmtInput(it.pct);
+  pIn.placeholder = '0';
+  pIn.addEventListener('input', function(){ onPctInput(it.id, pIn); });
+  pIn.addEventListener('focus', function(){ pIn.select(); });
+  pIn.addEventListener('blur', function(){ refresh(null); });
+  fldP.appendChild(lblP);
+  fldP.appendChild(pIn);
+
+  /* Hidratación del prefermento */
+  var fldH = document.createElement('label');
+  fldH.className = 'fld fld-hyd';
+  var lblH = document.createElement('span');
+  lblH.className = 'fld-lbl';
+  lblH.textContent = 'Hidratación Prefermento (%)';
+  var hIn = document.createElement('input');
+  hIn.type = 'text';
+  hIn.setAttribute('inputmode','decimal');
+  hIn.className = 'ing-h';
+  hIn.value = fmtHyd(it.hyd != null ? it.hyd : 100);
+  hIn.placeholder = '100';
+  hIn.addEventListener('input', function(){
+    var v = parseNum(hIn.value);
+    if (hIn.value.trim() === '') v = 100;
+    if (isNaN(v) || v < 0) return;
+    it.hyd = v;
+    refresh(hIn);
+  });
+  hIn.addEventListener('focus', function(){ hIn.select(); });
+  hIn.addEventListener('blur', function(){ refresh(null); });
+  fldH.appendChild(lblH);
+  fldH.appendChild(hIn);
+
+  fields.appendChild(fldC);
+  fields.appendChild(fldG);
+  fields.appendChild(fldP);
+  fields.appendChild(fldH);
+
+  row.appendChild(top);
+  row.appendChild(fields);
+  return row;
+}
+
+function renderIngredients(){
+  var list = document.getElementById('ingList');
+  list.innerHTML = '';
+  var count = state.items.length;
+  for (var i = 0; i < count; i++){
+    list.appendChild(makeRow(state.items[i], i, count));
+  }
+}
+
+/* =========================================================
+   REFRESCO GLOBAL DE LA VISTA
+   ========================================================= */
+function refresh(exceptEl){
+  if (!isFinite(state.flourTotal) || state.flourTotal <= 0) state.flourTotal = 1000;
+  var list = document.getElementById('ingList');
+  var rows = list.querySelectorAll('.ing');
+  for (var i = 0; i < rows.length; i++){
+    var row = rows[i];
+    var it = byId(row.dataset.id);
+    if (!it) continue;
+    var gEl = row.querySelector('.ing-g');
+    var pEl = row.querySelector('.ing-p');
+    var hEl = row.querySelector('.ing-h');
+    if (gEl && gEl !== exceptEl){
+      var gv = fmtInput(itemGrams(it));
+      if (gEl.value !== gv) gEl.value = gv;
+    }
+    if (pEl && pEl !== exceptEl){
+      var pv = fmtInput(it.pct);
+      if (pEl.value !== pv) pEl.value = pv;
+    }
+    if (hEl && hEl !== exceptEl){
+      var hv = fmtHyd(it.hyd != null ? it.hyd : 100);
+      if (hEl.value !== hv) hEl.value = hv;
+    }
+    row.classList.toggle('is-flour', isFlour(it));
+    row.classList.toggle('has-hyd', isPref(it));
+  }
+  var ftEl = document.getElementById('flourTotal');
+  if (ftEl && ftEl !== exceptEl){
+    var ftv = fmtInput(state.flourTotal);
+    if (ftEl.value !== ftv) ftEl.value = ftv;
+  }
+  updateFlourSummary();
+  renderResults();
+  saveCurrent();
+}
+
+function updateFlourSummary(){
+  var box = document.getElementById('flourSummaryBox');
+  var val = document.getElementById('flourSumValue');
+  var alertEl = document.getElementById('flourAlert');
+  var autoBtn = document.getElementById('btnAutoLevel');
+  var fs = getFlours();
+
+  if (!fs.length){
+    box.className = 'flour-summary';
+    val.textContent = '0 %';
+    alertEl.className = 'alert err';
+    alertEl.textContent = 'La receta necesita al menos una harina como base.';
+    if (autoBtn) autoBtn.style.display = 'none';
+    return;
+  }
+
+  var sum = flourPctSum();
+  val.textContent = fmtP(sum) + ' %';
+
+  if (Math.abs(sum - 100) < 0.05){
+    box.className = 'flour-summary ok';
+    alertEl.className = 'alert';
+    alertEl.textContent = '';
+    if (autoBtn) autoBtn.style.display = 'none';
+  } else {
+    box.className = 'flour-summary err';
+    alertEl.className = 'alert err';
+    alertEl.textContent = 'Las harinas suman ' + fmtP(sum) +
+      ' % (deben sumar exactamente 100 %). Pulsa «Autonivelar» para ajustarlas proporcionalmente.';
+    if (autoBtn) autoBtn.style.display = 'block';
+  }
+}
+
+/* =========================================================
+   ENTRADA DE DATOS: GRAMOS (RESOLUCIÓN MULTI-HARINA CORREGIDA)
+   ========================================================= */
+function onGramsInput(id, el){
+  var it = byId(id);
+  if (!it) return;
+
+  var raw = el.value.trim();
+  if (raw === ''){
+    it.pct = 0;
+    refresh(el);
+    return;
+  }
+
+  var v = parseNum(raw, {grams:true});
+  if (isNaN(v) || v < 0){
+    toast('Introduce un número válido en gramos.', 'err');
+    return;
+  }
+
+  if (isFlour(it)){
+    var fs = getFlours();
+    if (fs.length === 1){
+      // Caso simple: 1 sola harina, define directamente el total
+      state.flourTotal = v > 0 ? v : 1;
+      it.pct = 100;
+    } else {
+      // Caso multi-harina: El usuario está indicando gramos directos de esta harina
+      // Calculamos la nueva suma de harinas sumando los gramos de las otras
+      var otherGrams = 0;
+      for (var i = 0; i < fs.length; i++){
+        if (fs[i].id !== it.id){
+          otherGrams += itemGrams(fs[i]);
+        }
+      }
+      var newTotalFlour = otherGrams + v;
+      if (newTotalFlour <= 0) newTotalFlour = 1;
+      state.flourTotal = newTotalFlour;
+
+      // Recalculamos los porcentajes de todas las harinas sobre la nueva base
+      for (var j = 0; j < fs.length; j++){
+        var g = (fs[j].id === it.id) ? v : itemGrams(fs[j]);
+        fs[j].pct = (g / newTotalFlour) * 100;
+      }
+    }
+  } else {
+    // Ingrediente no harina: calcula su porcentaje sobre la harina base actual
+    if (state.flourTotal <= 0) state.flourTotal = 1000;
+    it.pct = (v / state.flourTotal) * 100;
+  }
+
+  refresh(el);
+}
+
+/* =========================================================
+   ENTRADA DE DATOS: PORCENTAJES
+   ========================================================= */
+function onPctInput(id, el){
+  var it = byId(id);
+  if (!it) return;
+
+  var raw = el.value.trim();
+  if (raw === ''){
+    it.pct = 0;
+    refresh(el);
+    return;
+  }
+
+  var v = parseNum(raw);
+  if (isNaN(v) || v < 0){
+    toast('El porcentaje debe ser un número positivo.', 'err');
+    return;
+  }
+
+  it.pct = v;
+  refresh(el);
+}
+
+/* =========================================================
+   CAMBIO DE CATEGORÍA
+   ========================================================= */
+function onCatChange(id, newCat){
+  var it = byId(id);
+  if (!it || it.cat === newCat) return;
+
+  var wasFlour = isFlour(it);
+  var willBeFlour = (newCat === 'harina');
+
+  if (wasFlour && !willBeFlour && getFlours().length <= 1){
+    toast('La receta necesita al menos una harina.', 'err');
+    renderIngredients();
+    return;
+  }
+
+  it.cat = newCat;
+
+  if (wasFlour && !willBeFlour){
+    renormalizeFlours();
+  } else if (!wasFlour && willBeFlour){
+    it.pct = 0;
+  }
+
+  renderIngredients();
+  refresh(null);
+}
+
+/* =========================================================
+   AUTONIVELAR HARINAS AL 100 %
+   ========================================================= */
+function renormalizeFlours(){
+  var fs = getFlours();
+  if (!fs.length) return;
+  var sum = 0, i;
+  for (i = 0; i < fs.length; i++) sum += (fs[i].pct || 0);
+
+  if (sum <= 0){
+    for (i = 0; i < fs.length; i++) fs[i].pct = 100 / fs.length;
+  } else {
+    for (i = 0; i < fs.length; i++) fs[i].pct = (fs[i].pct / sum) * 100;
+  }
+}
+
+/* =========================================================
+   AÑADIR, MOVER Y ELIMINAR
+   ========================================================= */
+function addIngredient(){
+  state.items.push({ id: uid(), name: '', cat: 'otro', pct: 0, hyd: 100 });
+  renderIngredients();
+  refresh(null);
+}
+
+function addFlour(){
+  var fs = getFlours();
+  var it = { id: uid(), name: '', cat: 'harina', pct: 0, hyd: 100 };
+  state.items.push(it);
+  renormalizeFlours();
+  renderIngredients();
+  refresh(null);
+  toast('Harina añadida. Las harinas se han nivelado al 100 %.', 'ok');
+}
+
+function removeItem(id){
+  var it = byId(id);
+  if (!it) return;
+
+  if (isFlour(it) && getFlours().length <= 1){
+    toast('No puedes eliminar la única harina de la receta.', 'err');
+    return;
+  }
+
+  state.items = state.items.filter(function(x){ return x.id !== id; });
+  if (isFlour(it)) renormalizeFlours();
+
+  renderIngredients();
+  refresh(null);
+}
+
+function moveItem(id, dir){
+  var idx = -1;
+  for (var i = 0; i < state.items.length; i++){
+    if (state.items[i].id === id){ idx = i; break; }
+  }
+  if (idx < 0) return;
+  var target = idx + dir;
+  if (target < 0 || target >= state.items.length) return;
+
+  var temp = state.items[idx];
+  state.items[idx] = state.items[target];
+  state.items[target] = temp;
+
+  renderIngredients();
+  refresh(null);
+}
+
+/* =========================================================
+   CÁLCULOS Y RESULTADOS
+   ========================================================= */
+function getConsistencyBadge(hyd){
+  if (hyd <= 0) return '';
+  if (hyd < 57) return '<span class="dough-badge">Masa dura / Candeal</span>';
+  if (hyd < 67) return '<span class="dough-badge">Masa media estándar</span>';
+  if (hyd < 77) return '<span class="dough-badge">Masa hidratada</span>';
+  return '<span class="dough-badge">Alta hidratación</span>';
+}
+
+function renderResults(){
+  var st = computeStats(), pf = st.pf;
+  function tile(cls, k, v, s){
+    return '<div class="stat ' + cls + '"><div class="k">' + k + '</div>' +
+           '<div class="v">' + v + '</div>' + (s ? '<div class="s">' + s + '</div>' : '') + '</div>';
+  }
+  var html = '';
+  html += tile('primary', 'Peso total masa', fmtG(st.totalMass) + ' g', 'Harina base: ' + fmtG(st.flourMass) + ' g');
+  html += tile('', 'Fórmula total', fmtP(st.totalPct) + ' %', 'Suma de porcentajes');
+  html += tile('', 'Hidratación añadida', fmtP(st.waterPct) + ' %', fmtG(st.aguaG) + ' g de agua (agua + líquidos)');
+  if (pf.flours > 0 || pf.water > 0){
+    html += tile('real', 'Hidratación real', fmtP(st.realHyd) + ' %', 'Con prefermento ' + getConsistencyBadge(st.realHyd));
+    html += tile('', 'Harina real total', fmtG(st.realFlour) + ' g', 'Base + prefermento');
+    html += tile('', 'Agua real total', fmtG(st.realWater) + ' g', 'Añadida + prefermento');
+  } else if (st.waterPct > 0){
+    html += tile('', 'Consistencia masa', getConsistencyBadge(st.waterPct), 'Según % de agua');
+  }
+  document.getElementById('stats').innerHTML = html;
+  var extra = '';
+  for (var i = 0; i < state.items.length; i++){
+    var c = state.items[i].cat;
+    if ((c === 'liquido' || c === 'huevo') && state.items[i].pct > 0){ extra = ' Se cuenta la parte de agua de la leche/líquidos (87 %) y del huevo (75 %).'; break; }
+  }
+  var nota = document.getElementById('statsNote');
+  if (pf.flours > 0 || pf.water > 0){
+    nota.innerHTML = '🌾 <strong>Hidratación real calculada:</strong> Incluye los <strong>' + fmtG(pf.flours) +
+      ' g de harina</strong> y <strong>' + fmtG(pf.water) + ' g de agua</strong> aportados por los prefermentos.' + extra;
+  } else {
+    nota.textContent = 'Todos los porcentajes están referenciados al 100 % de la harina base.' + extra;
+  }
+}
+
+/* =========================================================
+   ASISTENTE DE HIDRATACIÓN OBJETIVO
+   ========================================================= */
+function autoSetWaterForTargetHyd(){
+  var targetH = parseNum(document.getElementById('targetHydVal').value);
+  if (isNaN(targetH) || targetH <= 0){ toast('Introduce un % de hidratación válido (ej. 72).', 'err'); return; }
+  var waterItem = null;
+  for (var i = 0; i < state.items.length; i++){ if (state.items[i].cat === 'agua'){ waterItem = state.items[i]; break; } }
+  if (!waterItem){ toast('Añade primero un ingrediente con categoría "Agua".', 'err'); return; }
+  var st = computeStats();
+  if (st.realFlour <= 0){ toast('Introduce primero la harina de la receta.', 'err'); return; }
+  var others = st.aguaG - itemGrams(waterItem);      // otras aguas, leche, huevo
+  var needed = st.realFlour * targetH / 100 - st.pf.water - others;
+  if (needed < 0){
+    waterItem.pct = 0; refresh(null);
+    var minH = st.realFlour > 0 ? (st.pf.water + others) / st.realFlour * 100 : 0;
+    toast('Objetivo inalcanzable: sin agua añadida la hidratación ya es ' + fmtP(minH) + ' %.', 'err');
+    return;
+  }
+  waterItem.pct = needed / state.flourTotal * 100;
+  refresh(null);
+  toast('💧 Agua ajustada al ' + fmtP(waterItem.pct) + ' % para alcanzar ' + fmtP(targetH) + ' % real.', 'ok');
+}
+
+/* =========================================================
+   ESCALADO DE LA RECETA
+   ========================================================= */
+function scaleTo(targetGrams){
+  if (!(targetGrams > 0) || !isFinite(targetGrams)){
+    toast('Introduce un peso total mayor que 0 g.', 'err');
+    return;
+  }
+  var tp = totalPctSum();
+  if (tp <= 0){
+    toast('Añade porcentajes a los ingredientes antes de escalar.', 'err');
+    return;
+  }
+  // Nueva harina total base = target / (tp / 100)
+  state.flourTotal = targetGrams / (tp / 100);
+  refresh(null);
+  toast('✅ Receta escalada a ' + fmtG(targetGrams) + ' g de masa cruda.', 'ok');
+}
+
+function updatePiecePreview(){
+  var n = parseNum(document.getElementById('numPieces').value);
+  var w = parseNum(document.getElementById('pieceWeight').value, {grams:true});
+  var loss = parseNum(document.getElementById('bakeLoss').value) || 0;
+  var el = document.getElementById('targetPreview');
+
+  if (loss < 0 || loss > 50){ el.textContent = 'Merma fuera de rango (0–50 %)'; return; }
+  if (n > 0 && w > 0){
+    var baked = n * w;
+    var raw = loss > 0 ? (baked / (1 - (loss / 100))) : baked;
+    el.innerHTML = fmtG(baked) + ' g horneado ➔ <strong>' + fmtG(raw) + ' g masa cruda</strong> (' + fmtG(loss) + ' % merma)';
+  } else {
+    el.textContent = '—';
+  }
+}
+
+/* =========================================================
+   IMPRESIÓN NATIVA / FICHA DE OBRADOR
+   ========================================================= */
+function prepareAndPrint(){
+  var title = (state.name.trim() || 'Ficha Técnica de Panadería');
+  var st = computeStats(), totalMass = st.totalMass, flourMass = st.flourMass, realHyd = st.realHyd;
+
+  var rowsHtml = '';
+  for (var i = 0; i < state.items.length; i++){
+    var it = state.items[i];
+    var tag = isFlour(it) ? ' [Harina]' : (isPref(it) ? ' [Pref. ' + fmtPlain(it.hyd) + ' %]' : '');
+    rowsHtml += '<tr><td>☐ ' + esc(it.name || '(Sin nombre)') + tag + '</td>' +
+                '<td class="r"><strong>' + fmtPlain(itemGrams(it)) + ' g</strong></td>' +
+                '<td class="r">' + fmtPlain(it.pct) + ' %</td></tr>';
+  }
+
+  var sheet = document.getElementById('printSheet');
+  sheet.innerHTML = '<h1>' + esc(title) + '</h1>' +
+    '<div class="sub">Ficha de Obrador · Generado el ' + esc((new Date()).toLocaleDateString('es-ES')) + '</div>' +
+    '<table><thead><tr><th>Ingrediente</th><th class="r">Gramos</th><th class="r">% Panadero</th></tr></thead><tbody>' +
+    rowsHtml + '</tbody></table>' +
+    '<table style="margin-top:14px;background:#fafafa;"><tbody>' +
+    '<tr><td><strong>Peso Total Masa:</strong> ' + fmtPlain(totalMass) + ' g</td>' +
+    '<td class="r"><strong>Harina Base (100 %):</strong> ' + fmtPlain(flourMass) + ' g</td></tr>' +
+    '<tr><td><strong>Hidratación Real:</strong> ' + fmtPlain(realHyd) + ' %</td>' +
+    '<td class="r"><strong>Fórmula Total:</strong> ' + fmtPlain(totalPctSum()) + ' %</td></tr>' +
+    '</tbody></table>' +
+    '<div class="box-notes"><strong>Notas del amasado, fermentación y horneado:</strong></div>';
+
+  window.print();
+}
+
+/* =========================================================
+   PORTAPAPELES Y EXPORTACIONES
+   ========================================================= */
+function buildPlainText(){
+  var L = [];
+  L.push((state.name.trim() || 'RECETA DE PANADERÍA').toUpperCase());
+  L.push('--------------------------------------------------');
+  L.push('Harina Base de Referencia: ' + fmtPlain(state.flourTotal) + ' g (100 %)');
+  L.push('');
+  L.push('INGREDIENTES:');
+  for (var i = 0; i < state.items.length; i++){
+    var it = state.items[i];
+    L.push('- ' + (it.name || 'Ingrediente') + ': ' + fmtPlain(itemGrams(it)) + ' g (' + fmtPlain(it.pct) + ' %)');
+  }
+  L.push('');
+  L.push('Masa Total: ' + fmtPlain(totalMassGrams()) + ' g');
+  L.push('Hidratación real: ' + fmtPlain(computeStats().realHyd) + ' %');
+  return L.join('\n');
+}
+
+function copyRecipeText(){
+  var txt = buildPlainText();
+  function fallback(){
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0;';
+      document.body.appendChild(ta); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast(ok ? '📋 Receta copiada al portapapeles.' : 'No se pudo copiar. Usa «Descargar TXT».', ok ? 'ok' : 'err');
+    } catch(e){ toast('No se pudo copiar. Usa «Descargar TXT».', 'err'); }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ toast('📋 Receta copiada al portapapeles.', 'ok'); }, fallback);
+  } else { fallback(); }
+}
+
+function exportTXT(){
+  var blob = new Blob([buildPlainText()], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.name.trim().toLowerCase().replace(/\s+/g,'_') || 'receta') + '.txt';
+  a.click();
+  toast('Receta descargada en TXT.', 'ok');
+}
+
+function downloadAppHtml(){
+  try {
+    var html = PRISTINE_HTML.replace(/<script[^>]*data-bard-client-injected[\s\S]*?<\/script>/g, '');
+    if (html.length < 2000) throw new Error('sin plantilla');
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'calculadora_panaderia_v4.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1500);
+    toast('📥 Archivo HTML descargado listo para usar offline.', 'ok');
+  } catch(e){ toast('No se pudo generar la descarga del archivo.', 'err'); }
+}
+
+function exportBackup(){
+  var data = {
+    app: 'CalculadoraPanaderia',
+    version: 3,
+    date: new Date().toISOString(),
+    recipes: loadSaved()
+  };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'copia_recetas_panaderia_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('Copia de seguridad guardada.', 'ok');
+}
+
+function importBackup(file){
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var data;
+    try { data = JSON.parse(e.target.result); } catch(err){ toast('Error al leer el archivo JSON.', 'err'); return; }
+    if (!data || !Array.isArray(data.recipes)){ toast('Formato de archivo inválido.', 'err'); return; }
+    var inc = [];
+    data.recipes.forEach(function(r){
+      if (!r || typeof r !== 'object' || !Array.isArray(r.items)) return;
+      var ft = Number(r.flourTotal);
+      inc.push({ id: (typeof r.id === 'string' && r.id) ? r.id : uid(), name: String(r.name || 'Sin nombre'),
+        flourTotal: (isFinite(ft) && ft > 0) ? ft : 1000, items: sanitizeItems(r.items), updated: r.updated || Date.now() });
+    });
+    if (!inc.length){ toast('El archivo no contiene recetas válidas.', 'err'); return; }
+    askChoice('El archivo contiene ' + inc.length + ' receta(s). ¿Cómo quieres restaurarlas?', [
+      { label: 'Fusionar con mis recetas (recomendado)', cls: '', fn: function(){
+        var cur = loadSaved();
+        inc.forEach(function(n){
+          var idx = -1;
+          for (var k = 0; k < cur.length; k++){
+            if (cur[k].id === n.id || (cur[k].name || '').toLowerCase() === n.name.toLowerCase()){ idx = k; break; }
+          }
+          if (idx >= 0) cur[idx] = n; else cur.push(n);
+        });
+        saveSaved(cur); renderSavedRecipesList(); toast('Copia fusionada con éxito.', 'ok'); } },
+      { label: 'Reemplazar todas mis recetas', fn: function(){
+        saveSaved(inc); renderSavedRecipesList(); toast('Copia restaurada con éxito.', 'ok'); } },
+      { label: 'Cancelar', cls: 'ghost' }
+    ]);
+  };
+  reader.readAsText(file);
+}
+
+/* =========================================================
+   GESTIÓN DEL RECETARIO
+   ========================================================= */
+function renderSavedRecipesList(){
+  var list = loadSaved();
+  var box = document.getElementById('recipesList');
+  box.innerHTML = '';
+
+  if (!list.length){
+    box.innerHTML = '<div class="empty">No tienes recetas guardadas todavía.<br>Crea una en la pestaña Calculadora y pulsa "Guardar receta".</div>';
+    return;
+  }
+
+  for (var i = 0; i < list.length; i++){
+    (function(r){
+      var item = document.createElement('div');
+      item.className = 'recipe-item';
+
+      var info = document.createElement('div');
+      info.className = 'ri-info';
+
+      var nm = document.createElement('div');
+      nm.className = 'ri-name';
+      nm.textContent = r.name || 'Sin nombre';
+
+      var mt = document.createElement('div');
+      mt.className = 'ri-meta';
+      mt.textContent = 'Harina base: ' + fmtG(r.flourTotal) + ' g · ' + (r.items ? r.items.length : 0) + ' ingredientes';
+
+      info.appendChild(nm);
+      info.appendChild(mt);
+
+      var btnLoad = document.createElement('button');
+      btnLoad.className = 'btn-icon';
+      btnLoad.textContent = '📂';
+      btnLoad.title = 'Cargar';
+
+      var btnDel = document.createElement('button');
+      btnDel.className = 'btn-icon del';
+      btnDel.textContent = '🗑';
+      btnDel.title = 'Eliminar';
+      btnDel.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (btnDel.dataset.confirming === '1'){
+          var updated = loadSaved().filter(function(x){ return x.id !== r.id; });
+          saveSaved(updated);
+          renderSavedRecipesList();
+          toast('Receta "' + (r.name || '') + '" eliminada.');
+        } else {
+          btnDel.dataset.confirming = '1';
+          btnDel.textContent = '⚠️';
+          btnDel.title = 'Toca de nuevo para confirmar eliminación';
+          toast('Toca el icono ⚠️ de nuevo para confirmar eliminar.', 'err');
+          setTimeout(function(){
+            btnDel.dataset.confirming = '0';
+            btnDel.textContent = '🗑';
+            btnDel.title = 'Eliminar';
+          }, 3500);
+        }
+      });
+
+      item.appendChild(info);
+      item.appendChild(btnLoad);
+      item.appendChild(btnDel);
+
+      item.addEventListener('click', function(){
+        loadRecipe(r);
+      });
+
+      box.appendChild(item);
+    })(list[i]);
+  }
+}
+
+function saveCurrentRecipe(){
+  var name = (state.name || '').trim();
+  if (!name){
+    toast('Escribe un nombre para la receta.', 'err');
+    document.getElementById('recipeName').focus();
+    return;
+  }
+
+  var list = loadSaved();
+  var idx = -1;
+  for (var i = 0; i < list.length; i++){
+    if ((list[i].name || '').toLowerCase() === name.toLowerCase()){ idx = i; break; }
+  }
+
+  var entry = {
+    id: idx >= 0 ? list[idx].id : uid(),
+    name: name,
+    flourTotal: state.flourTotal,
+    items: JSON.parse(JSON.stringify(state.items)),
+    updated: Date.now()
+  };
+
+  if (idx >= 0){
+    list[idx] = entry;
+    toast('Receta actualizada: ' + name, 'ok');
+  } else {
+    list.unshift(entry);
+    toast('Receta guardada: ' + name, 'ok');
+  }
+
+  saveSaved(list);
+  renderSavedRecipesList();
+}
+
+function loadRecipe(r){ guardChanges(function(){ doLoadRecipe(r); }); }
+function doLoadRecipe(r){
+  var ft = Number(r.flourTotal);
+  state.name = r.name || '';
+  state.flourTotal = (isFinite(ft) && ft > 0) ? ft : 1000;
+  state.items = sanitizeItems(r.items);
+  var note = '';
+  if (!state.items.length || !getFlours().length){
+    state.items.unshift({ id: uid(), name: 'Harina de trigo', cat: 'harina', pct: 100, hyd: 100 });
+    note = ' (no tenía harina: se añadió una al 100 %)';
+  }
+  document.getElementById('recipeName').value = state.name;
+  renderIngredients();
+  refresh(null);
+  switchTab('calc');
+  toast('Receta cargada: ' + state.name + note, note ? 'err' : 'ok');
+}
+
+function duplicateRecipe(){
+  var base = (state.name || 'Receta').replace(/\s*\(Copia(?: \d+)?\)$/, '');
+  var names = loadSaved().map(function(x){ return (x.name || '').toLowerCase(); });
+  var n = 1, nm;
+  do { nm = base + ' (Copia' + (n > 1 ? ' ' + n : '') + ')'; n++; } while (names.indexOf(nm.toLowerCase()) >= 0);
+  state.name = nm;
+  document.getElementById('recipeName').value = state.name;
+  for (var i = 0; i < state.items.length; i++) state.items[i].id = uid();
+  saveCurrent();
+  toast('Receta duplicada. Pulsa guardar cuando termines.', 'ok');
+}
+
+var clearArmed = false;
+var clearTimer = null;
+function clearAll(){
+  var btn = document.getElementById('btnClear');
+  if (!clearArmed){
+    clearArmed = true;
+    btn.textContent = '⚠️ ¿Confirmar limpieza?';
+    toast('Pulsa de nuevo para confirmar el vaciado de campos.', 'err');
+    clearTimeout(clearTimer);
+    clearTimer = setTimeout(function(){
+      clearArmed = false;
+      btn.textContent = '🧹 Limpiar campos';
+    }, 3500);
+    return;
+  }
+  clearArmed = false;
+  btn.textContent = '🧹 Limpiar campos';
+  state.name = '';
+  state.flourTotal = 1000;
+  state.items = [
+    { id: uid(), name: 'Harina de trigo', cat: 'harina', pct: 100, hyd: 100 }
+  ];
+  document.getElementById('recipeName').value = '';
+  renderIngredients();
+  refresh(null);
+  toast('Campos restablecidos a valores iniciales.');
+}
+
+/* =========================================================
+   NAVEGACIÓN POR PESTAÑAS
+   ========================================================= */
+function switchTab(name){
+  var btns = document.querySelectorAll('#tabs button');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].classList.toggle('active', btns[i].dataset.tab === name);
+  }
+  var views = document.querySelectorAll('.view');
+  for (var j = 0; j < views.length; j++){
+    views[j].classList.toggle('active', views[j].id === 'view-' + name);
+  }
+  window.scrollTo(0,0);
+  if (name === 'recetas') renderSavedRecipesList();
+}
+
+/* =========================================================
+   EVENTOS
+   ========================================================= */
+function bindEvents(){
+  var btns = document.querySelectorAll('#tabs button');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].addEventListener('click', function(){ switchTab(this.dataset.tab); });
+  }
+
+  // Modos de entrada
+  var modeBtns = document.querySelectorAll('#modeSwitch button');
+  for (var m = 0; m < modeBtns.length; m++){
+    modeBtns[m].addEventListener('click', function(){
+      for (var k = 0; k < modeBtns.length; k++) modeBtns[k].classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('ingList').dataset.mode = this.dataset.mode;
+    });
+  }
+
+  // Harina base
+  document.getElementById('flourTotal').addEventListener('input', function(){
+    var v = parseNum(this.value, {grams:true});
+    if (!isNaN(v) && v > 0){
+      state.flourTotal = v;
+      refresh(this);
+    }
+  });
+
+  document.getElementById('flourTotal').addEventListener('blur', function(){ refresh(null); });
+
+  // Nombre
+  document.getElementById('recipeName').addEventListener('input', function(){
+    state.name = this.value;
+    saveCurrent();
+  });
+
+  // Botones principales
+  document.getElementById('btnAddIng').addEventListener('click', addIngredient);
+  document.getElementById('btnAddFlour').addEventListener('click', addFlour);
+  document.getElementById('btnAutoLevel').addEventListener('click', function(){
+    renormalizeFlours();
+    renderIngredients();
+    refresh(null);
+    toast('⚖️ Harinas niveladas exactamente al 100 %.', 'ok');
+  });
+
+  document.getElementById('btnAutoHyd').addEventListener('click', autoSetWaterForTargetHyd);
+
+  // Escalado
+  document.getElementById('btnCalcFlour').addEventListener('click', function(){
+    var v = parseNum(document.getElementById('targetWeight').value, {grams:true});
+    scaleTo(v);
+  });
+
+  document.getElementById('numPieces').addEventListener('input', updatePiecePreview);
+  document.getElementById('pieceWeight').addEventListener('input', updatePiecePreview);
+  document.getElementById('bakeLoss').addEventListener('input', updatePiecePreview);
+
+  document.getElementById('btnScale').addEventListener('click', function(){
+    var n = parseNum(document.getElementById('numPieces').value);
+    var w = parseNum(document.getElementById('pieceWeight').value, {grams:true});
+    var loss = parseNum(document.getElementById('bakeLoss').value) || 0;
+    if (loss < 0 || loss > 50){ toast('La merma debe estar entre 0 y 50 %.', 'err'); return; }
+    if (n > 0 && w > 0){
+      var baked = n * w;
+      var raw = loss > 0 ? (baked / (1 - (loss / 100))) : baked;
+      scaleTo(raw);
+    } else {
+      toast('Indica el número de piezas y el peso unitario.', 'err');
+    }
+  });
+
+  // Acciones
+  document.getElementById('btnSave').addEventListener('click', saveCurrentRecipe);
+  document.getElementById('btnDuplicate').addEventListener('click', duplicateRecipe);
+  document.getElementById('btnPrint').addEventListener('click', prepareAndPrint);
+  document.getElementById('btnCopyText').addEventListener('click', copyRecipeText);
+  document.getElementById('btnExport').addEventListener('click', exportTXT);
+  document.getElementById('btnDownloadAppHeader').addEventListener('click', downloadAppHtml);
+  document.getElementById('btnDownloadAppCard').addEventListener('click', downloadAppHtml);
+  document.getElementById('btnExportJson').addEventListener('click', exportBackup);
+  document.getElementById('btnImportJson').addEventListener('click', function(){
+    document.getElementById('fileImportJson').click();
+  });
+  document.getElementById('fileImportJson').addEventListener('change', function(){
+    if (this.files && this.files[0]) importBackup(this.files[0]);
+    this.value = '';
+  });
+  document.getElementById('btnClear').addEventListener('click', clearAll);
+  document.getElementById('btnReset').addEventListener('click', function(){ guardChanges(function(){
+    var ex = exampleRecipe();
+    state.name = ex.name;
+    state.flourTotal = ex.flourTotal;
+    state.items = ex.items;
+    document.getElementById('recipeName').value = state.name;
+    renderIngredients();
+    refresh(null);
+    toast('Receta de ejemplo restaurada.', 'ok');
+  }); });
+}
+
+/* =========================================================
+   INICIALIZACIÓN
+   ========================================================= */
+function init(){
+  var cargado = null;
+  try {
+    var raw = localStorage.getItem(LS_CURRENT);
+    if (raw) cargado = JSON.parse(raw);
+  } catch(e){ cargado = null; }
+
+  if (cargado && cargado.items && cargado.items.length){
+    state.name = cargado.name || '';
+    state.flourTotal = (isFinite(cargado.flourTotal) && cargado.flourTotal > 0) ? cargado.flourTotal : 1000;
+    state.items = sanitizeItems(cargado.items);
+  } else {
+    var ex = exampleRecipe();
+    state.name = ex.name;
+    state.flourTotal = ex.flourTotal;
+    state.items = ex.items;
+  }
+
+  document.getElementById('recipeName').value = state.name;
+  renderIngredients();
+  refresh(null);
+  renderSavedRecipesList();
+  bindEvents();
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+
+</body>
+</html>
